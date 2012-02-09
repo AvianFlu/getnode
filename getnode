@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+VERSION=${1}
+OUTPATH="node-v$VERSION"
+OUTFILE="$OUTPATH.tar.gz"
+URL="http://nodejs.org/dist/v$VERSION/$OUTFILE"
+
+errcheck() {
+  if [[ ${1} -ne 0 ]]; then
+    echo "Exit code ${1}: ${2}"
+    exit 1
+  fi
+}
+
+curl $URL -o $OUTFILE
+errcheck $? "Curl error."
+
+tar -zxvf $OUTFILE
+errcheck $? "Tar error."
+
+cd $OUTPATH
+errcheck $? "Error changing cwd."
+
+./configure
+errcheck $? "Error running configure script."
+
+make
+errcheck $? "Error compiling node."
+
+make install
+errcheck $? "Error installing after compile - try 'sudo make install'."
+
+cd ../
